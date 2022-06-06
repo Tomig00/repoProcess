@@ -7,6 +7,7 @@ const Mensajes = require('./apiMensajes')
 const { response } = require('express')
 const express = require('express')
 const routerProductos = require('./routers/productos')
+const routerRandom = require('./routers/random')
 const hbs = require('express-handlebars')
 const { Server: IOServer } = require('socket.io')
 const { Server: HttpServer } = require('http')
@@ -21,7 +22,6 @@ const LocalStrategy = require('passport-local').Strategy
 const {userDaos: User} = require('./daos/mainDaos')
 const {MONGO_URL, SECRET} = require('./src/views/config')
 const parseArgs = require('minimist')
-const {fork} = require('child_process')
 const script = require('bcrypt')
 const saltRounds = 10;
 
@@ -147,14 +147,8 @@ app.get('/info', (req, res) => {
   });
 })
 
-app.get('/api/randoms', (req, res) => {
-  const { cant } = req.query;
-  const forked = fork('random.js');
-  forked.send(cant || 100000000);
-  forked.on("message", (msg) => {
-    res.send(msg);
-  });
-})
+app.use('/api', routerRandom)
+
 
 app.get('/login', (req, res) => {
   req.logOut()
